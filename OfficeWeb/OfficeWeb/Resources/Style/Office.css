@@ -1,0 +1,57 @@
+﻿.ng-cloak {
+    display: none;
+}
+
+body {
+    width: 1000px;
+    margin: 0 auto;
+    font-family: '微软雅黑';
+}
+
+.Image img {
+    width: 100%;
+}
+
+.Loading {
+    position: absolute;
+    width: 400px;
+    height: 300px;
+    margin-top: -170px;
+    margin-left: -200px;
+    left: 50%;
+    top: 50%;
+}
+
+    .Loading img {
+        width: 100%;
+    }
+
+.Error {
+    position: absolute;
+    width: 600px;
+    height: 340px;
+    padding: 20px 60px;
+    margin-top: -210px;
+    margin-left: -360px;
+    left: 50%;
+    top: 50%;
+    background-color: #BFEFFF;
+    border-radius: 10px;
+}
+
+    .Error h1 {
+        font-size: 100px;
+        letter-spacing: 20px;
+        margin: 35px 10px;
+        font-weight: bold;
+    }
+
+    .Error .Explain {
+        margin-bottom: 40px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .Error .Hint {
+        font-size: 12px;
+    }
