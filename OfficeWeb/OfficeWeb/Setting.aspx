@@ -43,7 +43,7 @@
             <div ng-cloak class="panel-body ng-cloak">
                 <p>COM组件可以使OFFICE在页面总呈现更好的效果。</p>
                 <div class="bs-callout bs-callout-info" ng-repeat="item in environment">
-                    <h4>{{item.name}}检测</h4>
+                    <h4 style="margin-bottom:25px;">{{item.name}}检测</h4>
                     <div class="alert" ng-repeat="node in item.data" ng-class="{true:'alert-success',false:'alert-danger'}[node.value]">
                         <span ng-bind="node.name"></span>
                         <span ng-show="node.value">检测成功</span>
