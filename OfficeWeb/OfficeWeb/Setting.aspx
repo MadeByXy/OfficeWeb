@@ -14,7 +14,7 @@
     <div ng-app="app" ng-controller="controller">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">设置页</h3>
+                <h3 class="panel-title">参数设置</h3>
             </div>
             <div ng-cloak class="panel-body ng-cloak">
                 <div class="input-group">
