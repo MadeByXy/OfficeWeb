@@ -1,0 +1,15 @@
+﻿.ng-cloak {
+    display: none;
+}
+
+body {
+    width: 35%;
+    margin: 50px auto;
+}
+.btn-center{
+    border-left:none;
+    border-right:none;
+}
+.nomargin{
+    margin:0 !important;
+}

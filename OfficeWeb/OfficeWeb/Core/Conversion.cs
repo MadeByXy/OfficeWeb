@@ -77,50 +77,6 @@ namespace OfficeWeb.Core
         }
     }
 
-    class WordConversion : IConversion
-    {
-        private List<Task> TaskList = new List<Task>();
-        public Action<int, string> CallBack { get; set; }
-
-        public void ConvertToImage(string filePath, int resolution)
-        {
-            Aspose.Words.Document doc = new Aspose.Words.Document(filePath);
-            string imageName = Path.GetFileNameWithoutExtension(filePath);
-            Aspose.Words.Saving.ImageSaveOptions imageSaveOptions = new Aspose.Words.Saving.ImageSaveOptions(Aspose.Words.SaveFormat.Jpeg) { Resolution = resolution };
-
-            for (int i = 1; i <= doc.PageCount; i++)
-            {
-                int pageNum = i;
-                string imgPath = string.Format("{0}_{1}.Jpeg", Path.Combine(Path.GetDirectoryName(filePath), imageName), i.ToString("000"));
-                if (File.Exists(imgPath))
-                {
-                    InvokeCallBack(pageNum, imgPath);
-                    continue;
-                }
-
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    imageSaveOptions.PageIndex = i - 1;
-                    doc.Save(stream, imageSaveOptions);
-                    using (Image image = Image.FromStream(stream))
-                    {
-                        new Bitmap(image).Save(imgPath, ImageFormat.Jpeg);
-                    }
-                }
-                InvokeCallBack(pageNum, imgPath);
-            }
-
-            Task.WaitAll(TaskList.ToArray());
-        }
-
-        private void InvokeCallBack(int pageNum,string imagePath)
-        {
-            Task task = new Task(() => { CallBack.Invoke(pageNum, imagePath); });
-            TaskList.Add(task);
-            task.Start();
-        }
-    }
-
     class PdfConversion : IConversion
     {
         private List<Task> TaskList = new List<Task>();
@@ -165,6 +121,42 @@ namespace OfficeWeb.Core
         }
     }
 
+    class WordConversion : IConversion
+    {
+        private List<Task> TaskList = new List<Task>();
+        public Action<int, string> CallBack { get; set; }
+
+        public void ConvertToImage(string filePath, int resolution)
+        {
+            //先将Word转换为PDF文件
+            string pdfPath;
+            try
+            {
+                using(WordToPdf convert = new WordToPdf())
+                {
+                    pdfPath = convert.ToPdf(filePath);
+                }
+            }
+            catch(ArgumentNullException)
+            {
+                pdfPath = Path.ChangeExtension(filePath, "pdf");
+                Aspose.Words.Document doc = new Aspose.Words.Document(filePath);
+                doc.Save(pdfPath, Aspose.Words.SaveFormat.Pdf);
+            }
+
+            //再将PDF转换为图片
+            PdfConversion converter = new PdfConversion() { CallBack = CallBack };
+            converter.ConvertToImage(pdfPath, resolution);
+        }
+
+        private void InvokeCallBack(int pageNum,string imagePath)
+        {
+            Task task = new Task(() => { CallBack.Invoke(pageNum, imagePath); });
+            TaskList.Add(task);
+            task.Start();
+        }
+    }
+
     class ExcelConversion : IConversion
     {
         public Action<int, string> CallBack { get; set; }
@@ -173,16 +165,13 @@ namespace OfficeWeb.Core
         {
             Aspose.Cells.Workbook doc = new Aspose.Cells.Workbook(filePath);
 
-            //先将Excel转换为pdf临时文件
-            string tmpPdfPath = filePath + ".pdf";
-            doc.Save(tmpPdfPath, Aspose.Cells.SaveFormat.Pdf);
+            //先将Excel转换为PDF临时文件
+            string pdfPath = Path.ChangeExtension(filePath, "pdf");
+            doc.Save(pdfPath, Aspose.Cells.SaveFormat.Pdf);
 
-            //再将pdf转换为图片
+            //再将PDF转换为图片
             PdfConversion converter = new PdfConversion() { CallBack = CallBack };
             converter.ConvertToImage(filePath, resolution);
-
-            //删除pdf临时文件
-            File.Delete(tmpPdfPath);
         }
     }
 
@@ -194,16 +183,13 @@ namespace OfficeWeb.Core
         {
             Aspose.Slides.Presentation doc = new Aspose.Slides.Presentation(filePath);
 
-            //先将ppt转换为pdf临时文件
-            string tmpPdfPath = filePath + ".pdf";
+            //先将ppt转换为PDF文件
+            string tmpPdfPath = Path.ChangeExtension(filePath, "pdf");
             doc.Save(tmpPdfPath, Aspose.Slides.Export.SaveFormat.Pdf);
 
-            //再将pdf转换为图片
+            //再将PDF转换为图片
             PdfConversion converter = new PdfConversion() { CallBack = CallBack };
             converter.ConvertToImage(filePath, resolution);
-
-            //删除pdf临时文件
-            File.Delete(tmpPdfPath);
         }
     }
 }
