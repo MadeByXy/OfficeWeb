@@ -41,7 +41,7 @@
                 <h3 class="panel-title">COM检测</h3>
             </div>
             <div ng-cloak class="panel-body ng-cloak">
-                <p>COM组件可以使转换呈现更好的效果</p>
+                <p>COM组件可以使OFFICE在页面总呈现更好的效果。</p>
                 <div class="bs-callout bs-callout-info" ng-repeat="item in environment">
                     <h4>{{item.name}}检测</h4>
                     <div class="alert" ng-repeat="node in item.data" ng-class="{true:'alert-success',false:'alert-danger'}[node.value]">
