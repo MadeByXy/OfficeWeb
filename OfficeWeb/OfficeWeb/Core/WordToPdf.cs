@@ -14,12 +14,19 @@ namespace OfficeWeb.Core
 
         public WordToPdf()
         {
-            Type type = Type.GetTypeFromProgID("Word.Application") ?? Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application");
-            if (type == null)
+            foreach (Type type in new Type[] { Type.GetTypeFromProgID("Word.Application"), Type.GetTypeFromProgID("KWps.Application"), Type.GetTypeFromProgID("wps.Application") })
             {
-                throw new COMException("未找到可用的COM组件。");
+                if (type != null)
+                {
+                    try
+                    {
+                        office = Activator.CreateInstance(type);
+                        return;
+                    }
+                    catch (COMException) { }
+                }
             }
-            office = Activator.CreateInstance(type);
+            throw new COMException("未找到可用的COM组件。");
         }
 
         public string ToPdf(string wpsFilename, string pdfFilename = null)

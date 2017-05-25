@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using OfficeWeb.Core;
 using System;
+using System.Runtime.InteropServices;
 
 namespace OfficeWeb
 {
@@ -34,12 +35,29 @@ namespace OfficeWeb
         {
             get
             {
-                JArray wordArray = new JArray();
-                wordArray.Add(new JObject() { { "name", "WPS" }, { "value", Type.GetTypeFromProgID("KWps.Application") != null || Type.GetTypeFromProgID("wps.Application") != null } });
-                wordArray.Add(new JObject() { { "name", "OFFICE" }, { "value", Type.GetTypeFromProgID("Word.Application") != null } });
-                JObject wordCheck = new JObject() { { "name", "Word" }, { "data", wordArray } };
+                JObject wordCheck = new JObject() { { "name", "Word: 检测COM组件是否存在" }, { "data", new JArray() {
+                    new JObject() { { "name", "WPS" }, { "value", Type.GetTypeFromProgID("KWps.Application") != null || Type.GetTypeFromProgID("wps.Application") != null } },
+                    new JObject() { { "name", "OFFICE" }, { "value", Type.GetTypeFromProgID("Word.Application") != null } }
+                } } };
 
-                return new JArray() { wordCheck };
+                bool[] array = new bool[2];
+                Type[] typeArray = new Type[] { Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application"), Type.GetTypeFromProgID("Word.Application") };
+                for (int i = 0; i < typeArray.Length; i++)
+                {
+                    try
+                    {
+                        Activator.CreateInstance(typeArray[i]);
+                        array[i] = true;
+                    }
+                    catch (COMException) { }
+                }
+
+                JObject canUseCheck = new JObject() { { "name", "Word: 检测COM组件是否可用" }, { "data", new JArray() {
+                    new JObject() { { "name", "WPS" }, { "value", array[0] } },
+                    new JObject() { { "name", "OFFICE" }, { "value", array[1] } }
+                } } };
+
+                return new JArray() { wordCheck, canUseCheck };
             }
         }
     }
