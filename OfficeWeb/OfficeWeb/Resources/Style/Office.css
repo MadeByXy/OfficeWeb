@@ -8,8 +8,13 @@ body {
     font-family: '微软雅黑';
 }
 
-.Image img {
+img {
     width: 100%;
+}
+
+.Loading_Bottom {
+    width: 20%;
+    margin: 0 auto;
 }
 
 .Loading {
@@ -21,10 +26,6 @@ body {
     left: 50%;
     top: 50%;
 }
-
-    .Loading img {
-        width: 100%;
-    }
 
 .Error {
     position: absolute;

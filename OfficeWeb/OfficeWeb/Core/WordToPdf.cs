@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Word;
 
 namespace OfficeWeb.Core
@@ -13,17 +14,17 @@ namespace OfficeWeb.Core
 
         public WordToPdf()
         {
-            Type type = Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application") ?? Type.GetTypeFromProgID("Word.Application");
+            Type type = Type.GetTypeFromProgID("Word.Application") ?? Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application");
             if (type == null)
             {
-                throw new ArgumentNullException("未找到可用的COM组件。");
+                throw new COMException("未找到可用的COM组件。");
             }
             office = Activator.CreateInstance(type);
         }
 
         public string ToPdf(string wpsFilename, string pdfFilename = null)
         {
-            if (wpsFilename == null) { throw new ArgumentNullException("wpsFilename"); }
+            if (wpsFilename == null) { throw new COMException("未找到指定文件。"); }
 
             if (pdfFilename == null)
             {

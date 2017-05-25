@@ -21,6 +21,9 @@
                 <img ng-src="{{item.imageUrl}}" />
             </div>
         </div>
+        <div ng-cloak class="Loading_Bottom ng-cloak" ng-show="status == 'running' && imageList != null && imageList.length != 0">
+            <img alt="" src="/Resources/Images/Loading.gif" />
+        </div>
     </div>
     <script type='text/javascript' src='/Resources/Scripts/jquery-1.8.0.min.js'></script>
     <script type='text/javascript' src='/Resources/Scripts/angular.min.js'></script>

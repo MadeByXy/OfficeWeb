@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace OfficeWeb.Core
@@ -34,7 +35,7 @@ namespace OfficeWeb.Core
         /// <summary>
         /// 图片转换质量
         /// </summary>
-        private const int Resolution = 200;
+        private const int Resolution = 170;
         /// <summary>
         /// 实例化转换工具
         /// </summary>
@@ -132,16 +133,19 @@ namespace OfficeWeb.Core
             string pdfPath;
             try
             {
-                using(WordToPdf convert = new WordToPdf())
+                using (WordToPdf convert = new WordToPdf())
                 {
                     pdfPath = convert.ToPdf(filePath);
                 }
             }
-            catch(ArgumentNullException)
+            catch (COMException)
             {
                 pdfPath = Path.ChangeExtension(filePath, "pdf");
-                Aspose.Words.Document doc = new Aspose.Words.Document(filePath);
-                doc.Save(pdfPath, Aspose.Words.SaveFormat.Pdf);
+                if (!File.Exists(pdfPath))
+                {
+                    Aspose.Words.Document doc = new Aspose.Words.Document(filePath);
+                    doc.Save(pdfPath, Aspose.Words.SaveFormat.Pdf);
+                }
             }
 
             //再将PDF转换为图片
