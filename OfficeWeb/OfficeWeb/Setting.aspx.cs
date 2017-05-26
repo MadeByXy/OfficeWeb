@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using OfficeWeb.Core;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace OfficeWeb
@@ -35,30 +36,54 @@ namespace OfficeWeb
         {
             get
             {
-                JObject wordCheck = new JObject() { { "name", "Word: 检测COM组件是否存在" }, { "data", new JArray() {
-                    new JObject() { { "name", "WPS" }, { "value", Type.GetTypeFromProgID("KWps.Application") != null || Type.GetTypeFromProgID("wps.Application") != null } },
-                    new JObject() { { "name", "OFFICE" }, { "value", Type.GetTypeFromProgID("Word.Application") != null } }
-                } } };
+                Dictionary<string, CheckModel[]> checks = new Dictionary<string, CheckModel[]>();
+                checks.Add("Word: 检测COM组件是否存在", new CheckModel[] {
+                    new CheckModel() { Name = "WPS", Status = Type.GetTypeFromProgID("KWps.Application") != null || Type.GetTypeFromProgID("wps.Application") != null },
+                    new CheckModel() { Name = "OFFICE", Status = Type.GetTypeFromProgID("Word.Application") != null }
+                });
 
-                bool[] array = new bool[2];
-                Type[] typeArray = new Type[] { Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application"), Type.GetTypeFromProgID("Word.Application") };
-                for (int i = 0; i < typeArray.Length; i++)
+                checks.Add("Word: 检测COM组件是否可用", new Func<CheckModel[]>(() =>
                 {
-                    try
+                    CheckModel[] checkModels = new CheckModel[] { new CheckModel() { Name = "WPS" }, new CheckModel() { Name = "OFFICE" } };
+                    Type[] typeArray = new Type[] { Type.GetTypeFromProgID("KWps.Application") ?? Type.GetTypeFromProgID("wps.Application"), Type.GetTypeFromProgID("Word.Application") };
+                    for (int i = 0; i < typeArray.Length; i++)
                     {
-                        Activator.CreateInstance(typeArray[i]);
-                        array[i] = true;
+                        try
+                        {
+                            Activator.CreateInstance(typeArray[i]);
+                            checkModels[i].Status = true;
+                        }
+                        catch (COMException e) { checkModels[i].Message = e.Message; }
                     }
-                    catch (COMException) { }
+                    return checkModels;
+                }).Invoke());
+
+                JArray resultArray = new JArray();
+                foreach (string check in checks.Keys)
+                {
+                    JObject result = new JObject();
+                    result.Add("name", check);
+                    result.Add("data", new JArray());
+                    foreach (var checkModel in checks[check])
+                    {
+                        JObject item = new JObject();
+                        item.Add("name", checkModel.Name);
+                        item.Add("value", checkModel.Status);
+                        item.Add("message", checkModel.Message);
+                        (result["data"] as JArray).Add(item);
+                    }
+                    resultArray.Add(result);
                 }
 
-                JObject canUseCheck = new JObject() { { "name", "Word: 检测COM组件是否可用" }, { "data", new JArray() {
-                    new JObject() { { "name", "WPS" }, { "value", array[0] } },
-                    new JObject() { { "name", "OFFICE" }, { "value", array[1] } }
-                } } };
-
-                return new JArray() { wordCheck, canUseCheck };
+                return resultArray;
             }
+        }
+
+        public class CheckModel
+        {
+            public string Name { get; set; }
+            public bool Status { get; set; } = false;
+            public string Message { get; set; }
         }
     }
 }
