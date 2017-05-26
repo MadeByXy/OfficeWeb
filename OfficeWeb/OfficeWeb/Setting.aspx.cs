@@ -62,14 +62,21 @@ namespace OfficeWeb
                 foreach (string check in checks.Keys)
                 {
                     JObject result = new JObject();
-                    result.Add("name", check);
+                    result.Add("Name", check);
+                    result.Add("Data", new JArray());
                     foreach (var checkModel in checks[check])
                     {
                         JObject item = new JObject();
-                        item.Add("name", checkModel.Name);
-                        item.Add("value", checkModel.Status);
-                        item.Add("message", checkModel.Message);
-                        result.Add("data", new JArray() { item });
+                        foreach (var property in checkModel.GetType().GetProperties())
+                        {
+                            object value = property.GetValue(checkModel, null);
+                            switch (property.PropertyType.Name)
+                            {
+                                case nameof(Boolean): item.Add(property.Name, bool.Parse(value.ToString())); break;
+                                case nameof(String): item.Add(property.Name, value as string); break;
+                            }
+                        }
+                        (result["Data"] as JArray).Add(item);
                     }
                     resultArray.Add(result);
                 }

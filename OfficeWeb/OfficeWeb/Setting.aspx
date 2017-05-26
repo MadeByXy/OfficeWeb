@@ -43,12 +43,12 @@
             <div ng-cloak class="panel-body ng-cloak">
                 <p>COM组件可以使OFFICE在页面总呈现更好的效果。</p>
                 <div class="bs-callout bs-callout-info" ng-repeat="item in environment">
-                    <h4 style="margin-bottom:25px;" ng-bind="item.name"></h4>
-                    <div class="alert" ng-repeat="node in item.data" ng-class="{true:'alert-success',false:'alert-danger'}[node.value]">
-                        <span ng-bind="node.name"></span>
-                        <span ng-if="node.value">检测成功</span>
-                        <span ng-if="!node.value">检测失败</span>
-                        <p style="margin: 10px 0;font-size: 11px;" ng-if="!node.value" ng-bind="node.message"></p>
+                    <h4 style="margin-bottom:25px;" ng-bind="item.Name"></h4>
+                    <div class="alert" ng-repeat="node in item.Data" ng-class="{true:'alert-success',false:'alert-danger'}[node.Status]">
+                        <span ng-bind="node.Name"></span>
+                        <span ng-if="node.Status">检测成功</span>
+                        <span ng-if="!node.Status">检测失败</span>
+                        <p style="margin: 10px 0;font-size: 11px;" ng-if="!node.Status" ng-bind="node.Message"></p>
                     </div>
                 </div>
             </div>
