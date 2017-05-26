@@ -63,14 +63,13 @@ namespace OfficeWeb
                 {
                     JObject result = new JObject();
                     result.Add("name", check);
-                    result.Add("data", new JArray());
                     foreach (var checkModel in checks[check])
                     {
                         JObject item = new JObject();
                         item.Add("name", checkModel.Name);
                         item.Add("value", checkModel.Status);
                         item.Add("message", checkModel.Message);
-                        (result["data"] as JArray).Add(item);
+                        result.Add("data", new JArray() { item });
                     }
                     resultArray.Add(result);
                 }
