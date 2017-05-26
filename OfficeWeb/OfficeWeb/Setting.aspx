@@ -48,6 +48,7 @@
                         <span ng-bind="node.name"></span>
                         <span ng-if="node.value">检测成功</span>
                         <span ng-if="!node.value">检测失败</span>
+                        <p style="margin: 10px 0;font-size: 11px;" ng-if="!node.value" ng-bind="node.message"></p>
                     </div>
                 </div>
             </div>
